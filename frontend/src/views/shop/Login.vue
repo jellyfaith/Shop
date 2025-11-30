@@ -1,5 +1,5 @@
 <template>
-  <div class="login-container">
+  <div class="login-container bg-white dark:bg-gray-900 transition-colors duration-300">
     <div class="login-box">
       <h2>{{ $t('common.login') }}</h2>
       <el-form :model="form" label-width="0">
@@ -56,7 +56,6 @@ const login = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  @apply bg-white dark:bg-gray-900 transition-colors duration-300;
 }
 .login-box {
   background: white;
