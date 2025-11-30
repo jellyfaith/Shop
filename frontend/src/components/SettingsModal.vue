@@ -2,7 +2,7 @@
   <!-- 设置模态框对话框 -->
   <el-dialog
     v-model="visible"
-    title="Settings"
+    :title="$t('settingsModal.settings')"
     width="800px"
     class="settings-modal"
     :before-close="handleClose"
@@ -26,7 +26,7 @@
       <div class="w-3/4 pl-6 overflow-y-auto">
         <!-- 语言和区域设置面板 -->
         <div v-if="currentTab === 'language'">
-          <h3 class="text-xl font-bold mb-6 text-gray-800 dark:text-white">Language & Region</h3>
+          <h3 class="text-xl font-bold mb-6 text-gray-800 dark:text-white">{{ $t('settingsModal.languageAndCurrency') }}</h3>
           
           <!-- 语言选择 -->
           <div class="mb-8">
@@ -49,7 +49,7 @@
 
           <!-- 货币选择 -->
           <div class="mb-8">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Currency</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{{ $t('settingsModal.currency') }}</label>
             <select
               v-model="tempCurrency"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -63,20 +63,20 @@
 
         <!-- 外观设置面板 -->
         <div v-if="currentTab === 'appearance'">
-          <h3 class="text-xl font-bold mb-6 text-gray-800 dark:text-white">Appearance</h3>
+          <h3 class="text-xl font-bold mb-6 text-gray-800 dark:text-white">{{ $t('settingsModal.appearance') }}</h3>
           
           <!-- 深色模式切换 -->
           <div class="mb-8">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Theme Mode</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{{ $t('settingsModal.thememode') }}</label>
             <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
-              <span class="text-gray-900 dark:text-white">Dark Mode</span>
+              <span class="text-gray-900 dark:text-white">{{ $t('settingsModal.darkmode') }}</span>
               <el-switch v-model="themeStore.isDark" />
             </div>
           </div>
 
           <!-- 主题色选择 -->
           <div class="mb-8">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Primary Color</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">{{ $t('settingsModal.primaryColor') }}</label>
             <div class="flex gap-4">
               <div
                 v-for="color in colors"
@@ -103,9 +103,12 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useThemeStore } from '../stores/theme'
 import { useLocaleStore } from '../stores/locale'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 // 定义组件的 props，接收 modelValue 控制显示隐藏
 const props = defineProps({
@@ -129,18 +132,17 @@ const tempLocale = ref(localeStore.currentLocale)
 const tempCurrency = ref(localeStore.currency)
 
 // 设置选项卡配置
-const tabs = [
-  { id: 'language', label: 'Language & Region' },
-  { id: 'appearance', label: 'Appearance' },
-  { id: 'account', label: 'Account' }
-]
+const tabs = computed(() => [
+  { id: 'language', label: t('settingsModal.languageAndCurrency') },
+  { id: 'appearance', label: t('settingsModal.appearance') },
+  { id: 'account', label: t('settingsModal.account') }
+])
 
 // 支持的语言列表
-const languages = [
-  { code: 'en', name: 'English', native: 'English' },
-  { code: 'zh', name: 'Chinese', native: '中文' },
-  { code: 'es', name: 'Spanish', native: 'Español' }
-]
+const languages = computed(() => [
+  { code: 'en', name: t('settingsModal.english'), native: 'English' },
+  { code: 'zh', name: t('settingsModal.chinese'), native: '中文' },
+])
 
 // 可选的主题颜色列表
 const colors = ['#8B5CF6', '#409EFF', '#67C23A', '#E6A23C', '#F56C6C', '#909399']

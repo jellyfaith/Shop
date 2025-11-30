@@ -1,4 +1,4 @@
-import { set } from "vue-demi";
+import { h, set } from "vue-demi";
 
 export default {
   common: {
@@ -31,7 +31,11 @@ export default {
     price: '价格',
     description: '描述',
     cartEmpty: '购物车是空的',
-    all: '全部'
+    all: '全部',
+    more: '查看更多商品',
+    search: '搜索',
+    hot: "热门商品",
+    new: "新品上市"
   },
   admin: {
     title: '管理后台',
@@ -54,11 +58,27 @@ export default {
   settingsModal: {
     title: '设置',
     currency: '货币',
-    language: '语言'
+    language: '语言',
+    languageAndCurrency: '语言 & 货币',
+    english: '英语',
+    chinese: '中文',
+    languageAndCurrency: '语言 & 货币',
+    appearance: '外观',
+    account: '账户',
+    darkmode: '深色模式',
+    thememode: '主题模式',
+    primaryColor: '主色调',
+    settings: '设置'
   },
   cart: {
     title: '购物车',
     cartItems: '购物车商品'
     
+  },
+  setting:{
+      language: '语言',
+      currency: '货币',
+      change: '更改',
+      more: '更多设置'
   }
 }

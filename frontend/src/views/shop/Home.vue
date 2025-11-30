@@ -61,10 +61,10 @@
         <!-- 搜索按钮：直接使用动态主题色 -->
         <button 
           @click="fetchProducts"
-          class="w-full md:w-auto px-8 py-3 text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-lg active:scale-95 transform duration-150"
+          class="w-full md:w-auto px-8 py-3 text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-lg active:scale-95 transform duration-150 !w-28"
           :style="{ backgroundColor: themeColor }"
         >
-          Search
+          {{ $t('shop.search') }}
         </button>
       </div>
     </div>
@@ -76,13 +76,13 @@
       <div class="flex items-center justify-between mb-8">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           <span class="w-1 h-8 rounded-full" :style="{ backgroundColor: themeColor }"></span>
-          Trending Products
+          {{ $t('shop.hot') }}
         </h2>
         <span 
           class="text-sm text-gray-500 dark:text-gray-400 cursor-pointer transition-colors"
           :style="{ color: themeColor }"
         >
-          View All &rarr;
+          {{ $t('shop.more') }} &rarr;
         </span>
       </div>
 
@@ -120,7 +120,7 @@
                 class="text-xs font-semibold px-2 py-1 rounded-md bg-opacity-10"
                 :style="{ color: themeColor, backgroundColor: themeColor + '20' }"
               >
-                New Arrival
+                {{ $t('shop.new') }}
               </span>
             </div>
             <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-1 line-clamp-1 transition-colors group-hover:text-opacity-80">
@@ -146,7 +146,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { Search } from '@element-plus/icons-vue'
+import { Search, Shop } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { useThemeStore } from '../../stores/theme'

@@ -12,7 +12,7 @@ export default {
     delete: 'Delete',
     operations: 'Operations',
     logout: 'Logout',
-    language: 'Language'
+    language: 'Language' 
   },
   shop: {
     home: 'Home',
@@ -29,7 +29,11 @@ export default {
     price: 'Price',
     description: 'Description',
     cartEmpty: 'Your cart is empty',
-    all: 'All'
+    all: 'All',
+    more: 'View All',
+    search: 'Search',
+    hot: "Trending Products",
+    new: "New Arrival"
   },
   admin: {
     dashboard: 'Dashboard',
@@ -50,10 +54,26 @@ export default {
   settingsModal: {
     title: 'Settings',
     currency: 'Currency',
-    language: 'Language'
+    language: 'Language',
+    languageAndCurrency: 'Language & Currency',
+    english: 'English',
+    chinese: 'Chinese',
+    languageAndCurrency: 'Language & Currency',
+    appearance: 'Appearance',
+    account: 'Account',
+    darkmode: 'Dark Mode',
+    thememode: 'Theme Mode',
+    primaryColor: 'Primary Color',
+    settings: 'Settings'
   },
   cart: {
     title: 'Cart',
     cartItems: 'Cart Items'
+  },
+  setting:{
+    language: 'Language',
+    currency: 'Currency',
+    change: 'Change',
+    more: 'More Settings'
   }
 }
