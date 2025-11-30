@@ -20,8 +20,10 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import axios from 'axios'
 
+const { t } = useI18n()
 const products = ref([])
 
 onMounted(async () => {
@@ -29,8 +31,8 @@ onMounted(async () => {
   // products.value = res.data.data
   // Mock data
   products.value = [
-      { id: 1, name: '{{ $t('productList.product1') }}', price: 100, image: 'https://via.placeholder.com/150' },
-      { id: 2, name: '{{ $t('productList.product2') }}', price: 200, image: 'https://via.placeholder.com/150' }
+      { id: 1, name: t('productList.product1'), price: 100, image: 'https://via.placeholder.com/150' },
+      { id: 2, name: t('productList.product2'), price: 200, image: 'https://via.placeholder.com/150' }
   ]
 })
 
