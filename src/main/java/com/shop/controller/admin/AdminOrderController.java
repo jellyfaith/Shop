@@ -1,4 +1,4 @@
-package com.shop.controller;
+package com.shop.controller.admin;
 
 import com.shop.entity.OrderMaster;
 import com.shop.utils.Result;
@@ -9,37 +9,29 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/order")
-@Tag(name = "订单模块")
-public class OrderController {
-
-    @PostMapping("/create")
-    @Operation(summary = "创建订单")
-    public Result<String> create() {
-        return Result.success("订单创建成功");
-    }
+@RequestMapping("/backend/order")
+@Tag(name = "后台-订单管理")
+public class AdminOrderController {
 
     @GetMapping("/list")
-    @Operation(summary = "我的订单列表")
-    public Result<List<OrderMaster>> list() {
+    @Operation(summary = "所有订单列表")
+    public Result<List<OrderMaster>> list(@RequestParam(defaultValue = "1") Integer page,
+                                          @RequestParam(defaultValue = "10") Integer size) {
+        // TODO: Implement admin list logic
         return Result.success();
     }
 
     @GetMapping("/{orderNo}")
     @Operation(summary = "订单详情")
     public Result<OrderMaster> detail(@PathVariable String orderNo) {
+        // TODO: Implement detail logic
         return Result.success();
     }
 
-    @PostMapping("/pay/{orderNo}")
-    @Operation(summary = "模拟支付")
-    public Result<String> pay(@PathVariable String orderNo) {
-        return Result.success("支付成功");
-    }
-    
     @PostMapping("/send/{orderNo}")
-    @Operation(summary = "发货(管理员)")
+    @Operation(summary = "发货")
     public Result<String> send(@PathVariable String orderNo) {
+        // TODO: Implement send logic
         return Result.success("发货成功");
     }
 }

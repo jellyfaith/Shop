@@ -9,7 +9,7 @@ export const useLocaleStore = defineStore('locale', () => {
   const setLocale = (lang) => {
     currentLocale.value = lang
     i18n.global.locale.value = lang
-    localStorage.setItem('locale', lang)
+    localStorage.setItem('language', lang) // Changed key to match i18n config
   }
 
   const setCurrency = (curr) => {

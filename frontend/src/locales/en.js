@@ -12,7 +12,10 @@ export default {
     delete: 'Delete',
     operations: 'Operations',
     logout: 'Logout',
-    language: 'Language' 
+    language: 'Language',
+    confirmPassword: 'Confirm Password',
+    hasAccount: 'Already have an account? Login',
+    noAccount: 'No account? Register'
   },
   shop: {
     home: 'Home',
@@ -33,7 +36,9 @@ export default {
     more: 'View All',
     search: 'Search',
     hot: "Trending Products",
-    new: "New Arrival"
+    new: "New Arrival",
+    myOrders: "My Orders",
+    noOrders: "No orders found"
   },
   admin: {
     dashboard: 'Dashboard',

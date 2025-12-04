@@ -37,6 +37,16 @@ const routes = [
         // 购物车页面：/shop/cart
         path: 'cart',
         component: () => import('../views/shop/Cart.vue')
+      },
+      {
+        // 订单列表页：/shop/orders
+        path: 'orders',
+        component: () => import('../views/shop/OrderList.vue')
+      },
+      {
+        // 订单详情页：/shop/order/:orderNo
+        path: 'order/:orderNo',
+        component: () => import('../views/shop/OrderDetail.vue')
       }
     ]
   },

@@ -46,9 +46,29 @@ const fetchProduct = async () => {
   }
 }
 
-const addToCart = () => {
-  // Implement cart logic here
-  ElMessage.success(`Added ${quantity.value} ${product.value.name} to cart`)
+const addToCart = async () => {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    ElMessage.warning('Please login first')
+    // router.push('/shop/login') // Need to import router first if I want to redirect
+    return
+  }
+  try {
+    const res = await axios.post('/api/shop/cart', {
+      productId: product.value.id,
+      quantity: quantity.value
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (res.data.code === 200) {
+      ElMessage.success(`Added ${quantity.value} ${product.value.name} to cart`)
+    } else {
+      ElMessage.error(res.data.message)
+    }
+  } catch (e) {
+    console.error(e)
+    ElMessage.error('Failed to add to cart')
+  }
 }
 
 onMounted(() => {

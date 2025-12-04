@@ -28,6 +28,10 @@
             <router-link to="/shop/cart" class="text-gray-900 dark:text-gray-100 hover:text-gray-900 dark:hover:text-gray-100 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-[var(--el-color-primary)] text-sm font-medium transition-colors">
               {{ $t('shop.cart') }}
             </router-link>
+            <!-- 订单链接 -->
+            <router-link to="/shop/orders" class="text-gray-900 dark:text-gray-100 hover:text-gray-900 dark:hover:text-gray-100 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-[var(--el-color-primary)] text-sm font-medium transition-colors">
+              {{ $t('shop.myOrders') }}
+            </router-link>
           </div>
         </div>
 

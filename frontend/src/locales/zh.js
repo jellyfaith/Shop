@@ -14,7 +14,10 @@ export default {
     delete: '删除',
     operations: '操作',
     logout: '退出登录',
-    language: '语言'
+    language: '语言',
+    confirmPassword: '确认密码',
+    hasAccount: '已有账号？去登录',
+    noAccount: '没有账号？去注册'
   },
   shop: {
     home: '首页',
@@ -35,7 +38,9 @@ export default {
     more: '查看更多商品',
     search: '搜索',
     hot: "热门商品",
-    new: "新品上市"
+    new: "新品上市",
+    myOrders: "我的订单",
+    noOrders: "暂无订单"
   },
   admin: {
     title: '管理后台',

@@ -151,6 +151,7 @@ import { Search, Shop } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { useThemeStore } from '../../stores/theme'
+import { ElMessage } from 'element-plus'
 
 const router = useRouter()
 const themeStore = useThemeStore()
@@ -212,9 +213,30 @@ const goToDetail = (id) => {
   router.push(`/shop/product/${id}`)
 }
 
-// TODO: 接入购物车逻辑，目前仅控制台提示
-const addToCart = (product) => {
-  console.log('Added', product)
+// 接入购物车逻辑
+const addToCart = async (product) => {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    ElMessage.warning('Please login first')
+    router.push('/shop/login')
+    return
+  }
+  try {
+    const res = await axios.post('/api/shop/cart', {
+      productId: product.id,
+      quantity: 1
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (res.data.code === 200) {
+      ElMessage.success('Added to cart')
+    } else {
+      ElMessage.error(res.data.message)
+    }
+  } catch (e) {
+    console.error(e)
+    ElMessage.error('Failed to add to cart')
+  }
 }
 
 // 首次挂载时自动拉取列表
