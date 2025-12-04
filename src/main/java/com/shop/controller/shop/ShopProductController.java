@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 
+/**
+ * 商城商品浏览接口
+ */
 @RestController
 @RequestMapping("/shop/product")
 @Tag(name = "商城-商品浏览")
@@ -20,6 +23,17 @@ public class ShopProductController {
     @Autowired
     private ProductService productService;
 
+    /**
+     * 搜索商品列表
+     *
+     * @param page 页码
+     * @param size 每页大小
+     * @param keyword 搜索关键字
+     * @param categoryId 分类ID
+     * @param minPrice 最低价格
+     * @param maxPrice 最高价格
+     * @return 商品分页列表
+     */
     @GetMapping("/list")
     @Operation(summary = "商品搜索列表")
     public Result<Page<Product>> list(@RequestParam(defaultValue = "1") Integer page,
@@ -49,6 +63,12 @@ public class ShopProductController {
         return Result.success(productService.page(pageParam, wrapper));
     }
 
+    /**
+     * 获取商品详情
+     *
+     * @param id 商品ID
+     * @return 商品详情
+     */
     @GetMapping("/{id}")
     @Operation(summary = "商品详情")
     public Result<Product> detail(@PathVariable Long id) {
