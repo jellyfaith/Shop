@@ -81,7 +81,16 @@ export default {
       3: 'Completed',
       4: 'Cancelled',
       unknown: 'Unknown'
-    }
+    },
+    userProfile: 'User Profile',
+    email: 'Email',
+    updateSuccess: 'Update Successful',
+    updateFailed: 'Update Failed',
+    paymentMethod: 'Payment Method',
+    wechatPay: 'WeChat Pay',
+    alipay: 'Alipay',
+    orderCreated: 'Order Created Successfully',
+    orderFailed: 'Order Creation Failed'
   },
   admin: {
     dashboard: 'Dashboard',
@@ -118,7 +127,15 @@ export default {
     darkmode: 'Dark Mode',
     thememode: 'Theme Mode',
     primaryColor: 'Primary Color',
-    settings: 'Settings'
+    settings: 'Settings',
+    address: 'Shipping Address',
+    addAddress: 'Add Address',
+    editAddress: 'Edit Address',
+    deleteAddress: 'Delete Address',
+    setDefault: 'Set Default',
+    default: 'Default',
+    noAddress: 'No shipping address',
+    confirmDeleteAddress: 'Are you sure to delete this address?'
   },
   cart: {
     title: 'Cart',

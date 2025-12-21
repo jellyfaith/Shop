@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class OrderCreateDTO {
+    private Long receiverId; // Optional: Select from address book
     private String receiverName;
     private String receiverPhone;
     private String receiverAddress;

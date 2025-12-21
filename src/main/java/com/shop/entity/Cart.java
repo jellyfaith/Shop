@@ -6,23 +6,18 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("user")
-public class User {
-    @TableId(type = IdType.ASSIGN_ID)
+@TableName("cart_item")
+public class Cart {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private String username;
-    private String password;
-    private String email;
-    private String phone;
-    private String address;
+    private Long skuId;
+    private Integer quantity;
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
-
-    @TableLogic
-    private Integer deleted;
 }

@@ -27,6 +27,57 @@
     </div>
 
     <el-empty v-else :description="$t('shop.cartEmpty')" />
+
+    <!-- Checkout Dialog -->
+    <el-dialog v-model="checkoutVisible" :title="$t('shop.checkout')" width="600px">
+      <el-form :model="checkoutForm" label-width="100px">
+        <el-form-item :label="$t('shop.receiverInfo')">
+          <div v-if="addressList.length > 0" class="w-full">
+            <el-radio-group v-model="selectedAddressId" class="flex flex-col items-start w-full" @change="handleAddressSelect">
+              <el-radio v-for="addr in addressList" :key="addr.id" :label="addr.id" class="!ml-0 w-full border p-3 rounded h-auto !items-start mb-2 !h-auto">
+                <div class="flex flex-col text-left whitespace-normal leading-normal ml-2">
+                  <span class="font-bold text-base">{{ addr.name }} <span class="ml-2 text-gray-500 text-sm">{{ addr.phone }}</span></span>
+                  <span class="text-gray-500 text-sm mt-1 break-all">{{ addr.address }}</span>
+                </div>
+              </el-radio>
+              <el-radio :label="-1" class="!ml-0 w-full border p-3 rounded !h-auto !items-start mb-2">
+                <div class="flex flex-col text-left whitespace-normal leading-normal ml-2">
+                  <span class="font-bold text-base">
+                    {{ $t('common.add') }} / {{ $t('shop.address') }}
+                  </span>
+                </div>
+              </el-radio>
+            </el-radio-group>
+          </div>
+          <div v-else class="text-gray-500 mb-2">{{ $t('settingsModal.noAddress') }}</div>
+        </el-form-item>
+
+        <div v-if="selectedAddressId === -1 || addressList.length === 0" class="border-t pt-4 mt-2">
+          <el-form-item :label="$t('shop.name')">
+            <el-input v-model="checkoutForm.receiverName" />
+          </el-form-item>
+          <el-form-item :label="$t('shop.phone')">
+            <el-input v-model="checkoutForm.receiverPhone" />
+          </el-form-item>
+          <el-form-item :label="$t('shop.address')">
+            <el-input v-model="checkoutForm.receiverAddress" type="textarea" />
+          </el-form-item>
+        </div>
+
+        <el-form-item :label="$t('shop.paymentMethod')">
+          <el-radio-group v-model="checkoutForm.paymentMethod">
+            <el-radio label="WECHAT">{{ $t('shop.wechatPay') }}</el-radio>
+            <el-radio label="ALIPAY">{{ $t('shop.alipay') }}</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="checkoutVisible = false">{{ $t('common.cancel') }}</el-button>
+          <el-button type="primary" @click="confirmCheckout" :loading="checkoutLoading">{{ $t('common.submit') }}</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -42,6 +93,17 @@ const { t } = useI18n()
 const router = useRouter()
 const cartItems = ref([])
 const totalPrice = ref(0)
+const checkoutVisible = ref(false)
+const checkoutLoading = ref(false)
+const addressList = ref([])
+const selectedAddressId = ref(-1)
+const checkoutForm = ref({
+  receiverId: null,
+  receiverName: '',
+  receiverPhone: '',
+  receiverAddress: '',
+  paymentMethod: 'WECHAT'
+})
 
 const fetchCart = async () => {
   const token = localStorage.getItem('token')
@@ -90,25 +152,74 @@ const removeItem = async (productId) => {
 const checkout = async () => {
   const token = localStorage.getItem('token')
   try {
-    // Simple checkout for now
-    const res = await axios.post('/api/shop/order/create', {
-        receiverName: "Test User", // Placeholder
-        receiverPhone: "1234567890",
-        receiverAddress: "Test Address",
-        paymentMethod: "WECHAT"
-    }, {
+    // Fetch addresses
+    const res = await axios.get('/api/shop/receiver/list', {
       headers: { Authorization: `Bearer ${token}` }
     })
     if (res.data.code === 200) {
-      ElMessage.success('Order created! Order No: ' + res.data.data)
-      fetchCart()
-      // router.push('/shop/order/' + res.data.data)
-    } else {
-      ElMessage.error(res.data.message)
+      addressList.value = res.data.data
+      // Select default if exists
+      const defaultAddr = addressList.value.find(a => a.isDefault)
+      if (defaultAddr) {
+        selectedAddressId.value = defaultAddr.id
+        handleAddressSelect(defaultAddr.id)
+      } else if (addressList.value.length > 0) {
+        selectedAddressId.value = addressList.value[0].id
+        handleAddressSelect(addressList.value[0].id)
+      } else {
+        selectedAddressId.value = -1
+        handleAddressSelect(-1)
+      }
     }
   } catch (e) {
     console.error(e)
-    ElMessage.error('Checkout failed')
+    selectedAddressId.value = -1
+  }
+  checkoutVisible.value = true
+}
+
+const handleAddressSelect = (val) => {
+  if (val === -1) {
+    checkoutForm.value.receiverId = null
+    checkoutForm.value.receiverName = ''
+    checkoutForm.value.receiverPhone = ''
+    checkoutForm.value.receiverAddress = ''
+  } else {
+    const addr = addressList.value.find(a => a.id === val)
+    if (addr) {
+      checkoutForm.value.receiverId = addr.id
+      checkoutForm.value.receiverName = addr.name
+      checkoutForm.value.receiverPhone = addr.phone
+      checkoutForm.value.receiverAddress = addr.address
+    }
+  }
+}
+
+const confirmCheckout = async () => {
+  if (!checkoutForm.value.receiverName || !checkoutForm.value.receiverPhone || !checkoutForm.value.receiverAddress) {
+    ElMessage.warning(t('common.fillAllFields'))
+    return
+  }
+  
+  checkoutLoading.value = true
+  const token = localStorage.getItem('token')
+  try {
+    const res = await axios.post('/api/shop/order/create', checkoutForm.value, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (res.data.code === 200) {
+      ElMessage.success(t('shop.orderCreated'))
+      checkoutVisible.value = false
+      fetchCart()
+      router.push('/shop/order/' + res.data.data)
+    } else {
+      ElMessage.error(res.data.msg || t('shop.orderFailed'))
+    }
+  } catch (e) {
+    console.error(e)
+    ElMessage.error(t('shop.orderFailed'))
+  } finally {
+    checkoutLoading.value = false
   }
 }
 

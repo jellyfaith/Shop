@@ -27,7 +27,6 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,6 +50,9 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private com.shop.service.ReceiverService receiverService;
+
     @Override
     @Transactional
     public String create(String username, OrderCreateDTO orderCreateDTO) {
@@ -70,10 +72,32 @@ public class OrderServiceImpl implements OrderService {
 
         // 3. Create Order Master
         OrderMaster orderMaster = new OrderMaster();
-        orderMaster.setOrderNo(UUID.randomUUID().toString().replace("-", ""));
+        // Gene Method: Time + Random + UserID suffix
+        String timeStr = java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmmss").format(LocalDateTime.now());
+        String randomStr = String.format("%04d", (int) (Math.random() * 10000));
+        String userIdStr = String.valueOf(user.getId());
+        String userSuffix = userIdStr.length() >= 4 ? userIdStr.substring(userIdStr.length() - 4) : String.format("%04d", user.getId());
+        orderMaster.setOrderNo(timeStr + randomStr + userSuffix);
+        
         orderMaster.setUserId(user.getId());
         orderMaster.setTotalAmount(cartVO.getTotalPrice());
         orderMaster.setStatus(0); // New Order
+        orderMaster.setPaymentMethod(orderCreateDTO.getPaymentMethod());
+
+        // Fill Receiver Info
+        if (orderCreateDTO.getReceiverId() != null) {
+            com.shop.entity.Receiver receiver = receiverService.getById(orderCreateDTO.getReceiverId());
+            if (receiver != null) {
+                orderMaster.setReceiverName(receiver.getName());
+                orderMaster.setReceiverPhone(receiver.getPhone());
+                orderMaster.setReceiverAddress(receiver.getAddress());
+            }
+        } else {
+            orderMaster.setReceiverName(orderCreateDTO.getReceiverName());
+            orderMaster.setReceiverPhone(orderCreateDTO.getReceiverPhone());
+            orderMaster.setReceiverAddress(orderCreateDTO.getReceiverAddress());
+        }
+
         orderMasterMapper.insert(orderMaster);
 
         // 4. Create Order Details & Deduct Stock
@@ -174,6 +198,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItemVO> itemVOs = details.stream().map(detail -> {
             OrderItemVO itemVO = new OrderItemVO();
             BeanUtils.copyProperties(detail, itemVO);
+            itemVO.setPrice(detail.getProductPrice()); // Map productPrice to price
             itemVO.setTotal(detail.getProductPrice().multiply(new BigDecimal(detail.getQuantity())));
             // Need to fetch product icon if needed
             return itemVO;

@@ -83,7 +83,16 @@ export default {
       3: '已完成',
       4: '已取消',
       unknown: '未知'
-    }
+    },
+    userProfile: '个人信息',
+    email: '邮箱',
+    updateSuccess: '更新成功',
+    updateFailed: '更新失败',
+    paymentMethod: '支付方式',
+    wechatPay: '微信支付',
+    alipay: '支付宝',
+    orderCreated: '订单创建成功',
+    orderFailed: '订单创建失败'
   },
   admin: {
     title: '管理后台',
@@ -122,7 +131,15 @@ export default {
     darkmode: '深色模式',
     thememode: '主题模式',
     primaryColor: '主色调',
-    settings: '设置'
+    settings: '设置',
+    address: '收货地址',
+    addAddress: '添加地址',
+    editAddress: '编辑地址',
+    deleteAddress: '删除地址',
+    setDefault: '设为默认',
+    default: '默认',
+    noAddress: '暂无收货地址',
+    confirmDeleteAddress: '确定要删除该地址吗？'
   },
   cart: {
     title: '购物车',

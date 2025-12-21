@@ -68,4 +68,22 @@ public class ShopUserController {
         }
         return Result.error("用户不存在");
     }
+
+    /**
+     * 更新用户信息
+     *
+     * @param user 用户信息
+     * @param request HTTP请求
+     * @return 更新结果
+     */
+    @PutMapping("/update")
+    @Operation(summary = "更新用户信息")
+    public Result<String> update(@RequestBody User user, HttpServletRequest request) {
+        String username = (String) request.getAttribute("username");
+        if (username == null) {
+            return Result.error("未登录");
+        }
+        user.setUsername(username); // Ensure we update the current user
+        return userService.update(user);
+    }
 }

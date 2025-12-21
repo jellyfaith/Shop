@@ -29,6 +29,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         "/user/login", 
                         "/user/register", 
+                        "/shop/user/login",
+                        "/shop/user/register",
                         "/backend/login", // Admin login
                         "/shop/login",    // Shop login
                         "/shop/product/**", // Public product access

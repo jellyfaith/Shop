@@ -30,7 +30,12 @@
             <img :src="item.productIcon" class="w-16 h-16 object-cover rounded-lg bg-gray-200">
             <div>
               <p class="font-medium text-gray-900 dark:text-white">{{ item.productName }}</p>
-              <p class="text-sm text-gray-500">¥{{ item.price }} x {{ item.quantity }}</p>
+              <p class="text-sm text-gray-500 mt-1" v-if="item.specs">
+                <span v-for="(val, key) in parseSpecs(item.specs)" :key="key" class="mr-3 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-xs">
+                  {{ key }}: {{ val }}
+                </span>
+              </p>
+              <p class="text-sm text-gray-500 mt-1">¥{{ item.price }} x {{ item.quantity }}</p>
             </div>
           </div>
           <p class="font-bold text-gray-900 dark:text-white">¥{{ item.total }}</p>
@@ -100,6 +105,15 @@ const getStatusText = (status) => {
 const getStatusType = (status) => {
   const map = { 0: 'warning', 1: 'success', 2: 'primary', 3: 'success', 4: 'info' }
   return map[status] || 'info'
+}
+
+const parseSpecs = (specsStr) => {
+  try {
+    if (!specsStr) return {}
+    return JSON.parse(specsStr)
+  } catch (e) {
+    return {}
+  }
 }
 
 onMounted(() => {

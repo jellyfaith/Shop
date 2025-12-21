@@ -6,23 +6,20 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-@TableName("user")
-public class User {
-    @TableId(type = IdType.ASSIGN_ID)
+@TableName("receiver")
+public class Receiver {
+    @TableId(type = IdType.AUTO)
     private Long id;
 
-    private String username;
-    private String password;
-    private String email;
+    private Long userId;
+    private String name;
     private String phone;
     private String address;
+    private Integer isDefault; // 0-No, 1-Yes
 
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
     @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
-
-    @TableLogic
-    private Integer deleted;
 }

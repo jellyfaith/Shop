@@ -108,7 +108,7 @@
           </div>
 
           <!-- 登录入口：Element Plus 按钮，强制覆盖背景色为主题色 -->
-          <div class="ml-3 relative" v-if="!user">
+          <div class="ml-3 relative" v-if="!userStore.userInfo">
              <el-button type="primary" 
              round 
              class="!bg-[var(--el-color-primary)] !border-[var(--el-color-primary)] hover:opacity-90 !font-medium !px-6 !w-24" 
@@ -118,22 +118,44 @@
           </div>
 
           <!-- User Dropdown -->
-          <div class="ml-3 relative" v-else>
-            <el-dropdown trigger="click">
-              <div class="flex items-center cursor-pointer text-gray-700 dark:text-gray-200 hover:text-[var(--el-color-primary)]">
-                <el-avatar :size="32" class="mr-2 bg-[var(--el-color-primary)]">{{ user.username.charAt(0).toUpperCase() }}</el-avatar>
-                <span class="font-medium">{{ user.username }}</span>
-                <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+          <div class="ml-3 relative group h-full flex items-center" v-else>
+            <div class="flex items-center cursor-pointer text-gray-700 dark:text-gray-200 hover:text-[var(--el-color-primary)] py-2 px-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+              <el-avatar :size="32" class="mr-2 bg-[var(--el-color-primary)]">{{ userStore.username.charAt(0).toUpperCase() }}</el-avatar>
+              <span class="font-medium">{{ userStore.username }}</span>
+              <el-icon class="el-icon--right transition-transform group-hover:rotate-180"><ArrowDown /></el-icon>
+            </div>
+            
+            <!-- Dropdown Menu -->
+            <div class="absolute right-0 top-14 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 transform origin-top-right scale-95 group-hover:scale-100 overflow-hidden">
+              <div class="py-1">
+                <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors" @click="$router.push('/shop/user/profile')">
+                  <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $t('settingsModal.account') }}</p>
+                  <p class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ userStore.username }}</p>
+                </div>
+                
+                <a @click="$router.push('/shop/cart')" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors">
+                  <el-icon class="mr-3"><ShoppingCart /></el-icon>
+                  {{ $t('shop.cart') }}
+                </a>
+                
+                <a @click="$router.push('/shop/orders')" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors">
+                  <el-icon class="mr-3"><List /></el-icon>
+                  {{ $t('shop.myOrders') }}
+                </a>
+
+                <a @click="openSettings" class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors">
+                  <el-icon class="mr-3"><Setting /></el-icon>
+                  {{ $t('settingsModal.settings') }}
+                </a>
+                
+                <div class="border-t border-gray-100 dark:border-gray-700 mt-1 pt-1">
+                  <a @click="handleLogout" class="flex items-center px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 cursor-pointer transition-colors">
+                    <el-icon class="mr-3"><SwitchButton /></el-icon>
+                    {{ $t('common.logout') }}
+                  </a>
+                </div>
               </div>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item @click="$router.push('/shop/orders')">{{ $t('shop.myOrders') }}</el-dropdown-item>
-                  <el-dropdown-item divided @click="logout">
-                    <span class="text-red-500">{{ $t('common.logout') }}</span>
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
+            </div>
           </div>
         </div> 
       </div>
@@ -146,16 +168,16 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { Moon, Sunny, ArrowDown } from '@element-plus/icons-vue'
+import { Moon, Sunny, ArrowDown, ShoppingCart, List, SwitchButton, Setting } from '@element-plus/icons-vue'
 import { useThemeStore } from '../stores/theme'
 import { useLocaleStore } from '../stores/locale'
+import { useUserStore } from '../stores/user'
 import SettingsModal from './SettingsModal.vue'
-import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 
 const router = useRouter()
-const user = ref(null)
+const userStore = useUserStore()
 
 // 引入状态管理 Store
 const themeStore = useThemeStore()
@@ -179,33 +201,13 @@ const openSettings = () => {
   showSettings.value = true
 }
 
-const fetchUserInfo = async () => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    try {
-      const res = await axios.get('/api/shop/user/info', {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      if (res.data.code === 200) {
-        user.value = res.data.data
-      } else {
-        localStorage.removeItem('token')
-      }
-    } catch (e) {
-      console.error(e)
-      localStorage.removeItem('token')
-    }
-  }
-}
-
-const logout = () => {
-  localStorage.removeItem('token')
-  user.value = null
+const handleLogout = () => {
+  userStore.logout()
   ElMessage.success('Logged out')
   router.push('/shop/login')
 }
 
 onMounted(() => {
-  fetchUserInfo()
+  userStore.fetchUserInfo()
 })
 </script>

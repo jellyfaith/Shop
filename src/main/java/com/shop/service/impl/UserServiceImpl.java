@@ -78,4 +78,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if (password.matches(".*[^a-zA-Z0-9].*")) types++; // 符号
         return types >= 2;
     }
+
+    @Override
+    public Result<String> update(User user) {
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getUsername, user.getUsername());
+        User dbUser = this.getOne(wrapper);
+        if (dbUser == null) {
+            return Result.error("用户不存在");
+        }
+        
+        // Update fields
+        if (user.getEmail() != null) dbUser.setEmail(user.getEmail());
+        if (user.getPhone() != null) dbUser.setPhone(user.getPhone());
+        if (user.getAddress() != null) dbUser.setAddress(user.getAddress());
+        
+        this.updateById(dbUser);
+        return Result.success("更新成功");
+    }
 }

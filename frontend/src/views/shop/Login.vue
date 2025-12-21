@@ -14,6 +14,20 @@
           effect="dark"
         />
       </transition>
+      
+      <!-- Success Alert -->
+      <transition name="el-fade-in-linear">
+        <el-alert
+          v-if="successMessage"
+          :title="successMessage"
+          type="success"
+          show-icon
+          :closable="true"
+          @close="successMessage = ''"
+          class="mb-6 !rounded-lg"
+          effect="dark"
+        />
+      </transition>
 
       <h2 class="dark:text-white">{{ isRegister ? $t('common.register') : $t('common.login') }}</h2>
       <el-form :model="form" label-width="0">
@@ -49,12 +63,15 @@ import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useI18n } from 'vue-i18n'
+import { useUserStore } from '../../stores/user'
 
 const { t } = useI18n()
 const router = useRouter()
+const userStore = useUserStore()
 const loading = ref(false)
 const isRegister = ref(false)
 const errorMessage = ref('')
+const successMessage = ref('')
 const form = ref({
   username: '',
   password: '',
@@ -64,6 +81,7 @@ const form = ref({
 // Clear error message when switching modes
 watch(isRegister, () => {
   errorMessage.value = ''
+  successMessage.value = ''
 })
 
 const toggleMode = () => {
@@ -73,6 +91,7 @@ const toggleMode = () => {
 
 const handleSubmit = async () => {
   errorMessage.value = '' // Clear previous errors
+  successMessage.value = ''
   
   if (!form.value.username || !form.value.password) {
     errorMessage.value = t('common.fillAllFields')
@@ -114,7 +133,10 @@ const login = async () => {
       password: form.value.password
     })
     if (res.data.code === 200) {
-      localStorage.setItem('token', res.data.data)
+      const token = res.data.data
+      userStore.setToken(token)
+      await userStore.fetchUserInfo() // Fetch user info immediately
+      
       ElMessage.success(t('common.loginSuccess'))
       // Check if there is a redirect query param
       const redirect = router.currentRoute.value.query.redirect || '/shop/home'
@@ -138,7 +160,7 @@ const register = async () => {
       password: form.value.password
     })
     if (res.data.code === 200) {
-      ElMessage.success(t('common.registerSuccess'))
+      successMessage.value = t('common.registerSuccess')
       // Switch to login mode
       isRegister.value = false
       // Clear password fields but keep username for convenience

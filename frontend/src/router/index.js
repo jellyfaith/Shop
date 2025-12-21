@@ -50,6 +50,12 @@ const routes = [
         path: 'order/:orderNo',
         component: () => import('../views/shop/OrderDetail.vue'),
         meta: { requiresAuth: true }
+      },
+      {
+        // 用户信息页：/shop/user/profile
+        path: 'user/profile',
+        component: () => import('../views/shop/UserProfile.vue'),
+        meta: { requiresAuth: true }
       }
     ]
   },

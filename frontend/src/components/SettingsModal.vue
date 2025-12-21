@@ -61,6 +61,35 @@
           </div>
         </div>
 
+        <!-- Address Management Panel -->
+        <div v-if="currentTab === 'address'">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-white">{{ $t('settingsModal.address') }}</h3>
+            <el-button type="primary" size="small" @click="openAddressDialog()">{{ $t('settingsModal.addAddress') }}</el-button>
+          </div>
+
+          <div v-if="addressList.length > 0" class="space-y-4">
+            <div v-for="addr in addressList" :key="addr.id" class="p-4 border rounded-lg dark:border-gray-700 relative group">
+              <div class="flex justify-between items-start">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold text-gray-900 dark:text-white">{{ addr.name }}</span>
+                    <span class="text-gray-500 dark:text-gray-400 text-sm">{{ addr.phone }}</span>
+                    <el-tag v-if="addr.isDefault" size="small" type="success">{{ $t('settingsModal.default') }}</el-tag>
+                  </div>
+                  <p class="text-gray-600 dark:text-gray-300 mt-1">{{ addr.address }}</p>
+                </div>
+                <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <el-button link type="primary" @click="openAddressDialog(addr)">{{ $t('common.edit') }}</el-button>
+                  <el-button link type="danger" @click="deleteAddress(addr.id)">{{ $t('common.delete') }}</el-button>
+                  <el-button v-if="!addr.isDefault" link type="warning" @click="setDefaultAddress(addr.id)">{{ $t('settingsModal.setDefault') }}</el-button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <el-empty v-else :description="$t('settingsModal.noAddress')" />
+        </div>
+
         <!-- 外观设置面板 -->
         <div v-if="currentTab === 'appearance'">
           <h3 class="text-xl font-bold mb-6 text-gray-800 dark:text-white">{{ $t('settingsModal.appearance') }}</h3>
@@ -89,6 +118,31 @@
             </div>
           </div>
         </div>
+
+        <!-- Account Settings Panel -->
+        <div v-if="currentTab === 'account'">
+          <h3 class="text-xl font-bold mb-6 text-gray-800 dark:text-white">{{ $t('settingsModal.account') }}</h3>
+          
+          <div class="bg-gray-50 dark:bg-gray-700/50 p-6 rounded-xl mb-6">
+            <div class="flex items-center mb-4">
+              <el-avatar :size="64" class="bg-[var(--el-color-primary)] text-2xl">{{ userStore.username ? userStore.username.charAt(0).toUpperCase() : 'U' }}</el-avatar>
+              <div class="ml-4">
+                <h4 class="text-lg font-bold text-gray-900 dark:text-white">{{ userStore.username }}</h4>
+                <p class="text-gray-500 dark:text-gray-400 text-sm">ID: {{ userStore.userInfo?.id || 'Loading...' }}</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 gap-4">
+              <div class="p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
+                <span class="text-gray-500 dark:text-gray-400 text-sm block mb-1">{{ $t('shop.email') }}</span>
+                <span class="text-gray-900 dark:text-white">{{ userStore.userInfo?.email || 'Not set' }}</span>
+              </div>
+              <div class="p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700">
+                <span class="text-gray-500 dark:text-gray-400 text-sm block mb-1">{{ $t('shop.phone') }}</span>
+                <span class="text-gray-900 dark:text-white">{{ userStore.userInfo?.phone || 'Not set' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -100,13 +154,40 @@
       </span>
     </template>
   </el-dialog>
+
+  <!-- Address Edit Dialog -->
+  <el-dialog v-model="addressDialogVisible" :title="isEdit ? $t('settingsModal.editAddress') : $t('settingsModal.addAddress')" width="500px" append-to-body>
+    <el-form :model="addressForm" label-width="80px">
+      <el-form-item :label="$t('shop.name')">
+        <el-input v-model="addressForm.name" />
+      </el-form-item>
+      <el-form-item :label="$t('shop.phone')">
+        <el-input v-model="addressForm.phone" />
+      </el-form-item>
+      <el-form-item :label="$t('shop.address')">
+        <el-input v-model="addressForm.address" type="textarea" />
+      </el-form-item>
+      <el-form-item>
+        <el-checkbox v-model="addressForm.isDefault" :true-label="1" :false-label="0">{{ $t('settingsModal.setDefault') }}</el-checkbox>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="addressDialogVisible = false">{{ $t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="saveAddress">{{ $t('common.save') }}</el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
 import { useThemeStore } from '../stores/theme'
 import { useLocaleStore } from '../stores/locale'
+import { useUserStore } from '../stores/user'
 import { useI18n } from 'vue-i18n'
+import axios from 'axios'
+import { ElMessage, ElMessageBox } from 'element-plus'
 
 const { t } = useI18n()
 
@@ -121,6 +202,7 @@ const emit = defineEmits(['update:modelValue'])
 // 初始化主题和语言状态管理 store
 const themeStore = useThemeStore()
 const localeStore = useLocaleStore()
+const userStore = useUserStore()
 
 // 控制对话框显示的响应式变量
 const visible = ref(props.modelValue)
@@ -135,6 +217,7 @@ const tempCurrency = ref(localeStore.currency)
 const tabs = computed(() => [
   { id: 'language', label: t('settingsModal.languageAndCurrency') },
   { id: 'appearance', label: t('settingsModal.appearance') },
+  { id: 'address', label: t('settingsModal.address') },
   { id: 'account', label: t('settingsModal.account') }
 ])
 
@@ -170,6 +253,106 @@ const saveSettings = () => {
   localeStore.setCurrency(tempCurrency.value)
   handleClose()
 }
+
+// Address Management Logic
+const addressList = ref([])
+const addressDialogVisible = ref(false)
+const isEdit = ref(false)
+const addressForm = ref({
+  id: null,
+  name: '',
+  phone: '',
+  address: '',
+  isDefault: 0
+})
+
+const fetchAddresses = async () => {
+  const token = localStorage.getItem('token')
+  if (!token) return
+  try {
+    const res = await axios.get('/api/shop/receiver/list', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (res.data.code === 200) {
+      addressList.value = res.data.data
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const openAddressDialog = (addr = null) => {
+  if (addr) {
+    isEdit.value = true
+    addressForm.value = { ...addr }
+  } else {
+    isEdit.value = false
+    addressForm.value = { id: null, name: '', phone: '', address: '', isDefault: 0 }
+  }
+  addressDialogVisible.value = true
+}
+
+const saveAddress = async () => {
+  const token = localStorage.getItem('token')
+  try {
+    const url = isEdit.value ? '/api/shop/receiver/update' : '/api/shop/receiver/add'
+    const method = isEdit.value ? 'put' : 'post'
+    const res = await axios[method](url, addressForm.value, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (res.data.code === 200) {
+      ElMessage.success(res.data.data || t('common.save') + ' ' + t('common.success')) // Fix: use t('common.success') if available or just generic
+      addressDialogVisible.value = false
+      fetchAddresses()
+    } else {
+      ElMessage.error(res.data.msg)
+    }
+  } catch (e) {
+    ElMessage.error(t('shop.updateFailed'))
+  }
+}
+
+const deleteAddress = (id) => {
+  ElMessageBox.confirm(t('settingsModal.confirmDeleteAddress'), t('common.delete'), {
+    confirmButtonText: t('common.submit'),
+    cancelButtonText: t('common.cancel'),
+    type: 'warning'
+  }).then(async () => {
+    const token = localStorage.getItem('token')
+    try {
+      const res = await axios.delete(`/api/shop/receiver/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (res.data.code === 200) {
+        ElMessage.success(t('shop.removed'))
+        fetchAddresses()
+      }
+    } catch (e) {
+      ElMessage.error(t('shop.updateFailed'))
+    }
+  })
+}
+
+const setDefaultAddress = async (id) => {
+  const token = localStorage.getItem('token')
+  try {
+    const res = await axios.post(`/api/shop/receiver/default/${id}`, {}, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (res.data.code === 200) {
+      ElMessage.success(t('shop.updateSuccess'))
+      fetchAddresses()
+    }
+  } catch (e) {
+    ElMessage.error(t('shop.updateFailed'))
+  }
+}
+
+watch(currentTab, (val) => {
+  if (val === 'address') {
+    fetchAddresses()
+  }
+})
 </script>
 
 <style scoped>

@@ -20,6 +20,11 @@ public class OrderMaster {
     private LocalDateTime deliveryTime;
     private LocalDateTime finishTime;
 
+    private String receiverName;
+    private String receiverPhone;
+    private String receiverAddress;
+    private String paymentMethod;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createTime;
 
