@@ -11,7 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 商城购物车接口
+ * 商城购物车控制器
+ * 负责处理用户购物车的添加、查询、更新和删除等操作
  */
 @RestController
 @RequestMapping("/shop/cart")
@@ -19,18 +20,23 @@ import org.springframework.web.bind.annotation.*;
 public class ShopCartController {
 
     @Autowired
-    private CartService cartService;
+    private CartService cartService;  // 购物车服务，处理购物车相关业务逻辑
 
+    /**
+     * 从HTTP请求中获取当前登录用户的用户名
+     * 假设JwtInterceptor已经将用户名设置到request属性中
+     * @param request HTTP请求
+     * @return 当前登录用户的用户名，未登录则返回null
+     */
     private String getUsername(HttpServletRequest request) {
-        // Assuming JwtInterceptor sets the "username" attribute
+        // 从请求属性中获取用户名（由JwtInterceptor设置）
         return (String) request.getAttribute("username");
     }
 
     /**
      * 获取当前用户的购物车列表
-     *
-     * @param request HTTP请求
-     * @return 购物车信息
+     * @param request HTTP请求，用于获取当前登录用户信息
+     * @return 购物车信息，包含商品列表和总金额
      */
     @GetMapping
     @Operation(summary = "获取购物车列表")
@@ -44,9 +50,8 @@ public class ShopCartController {
 
     /**
      * 添加商品到购物车
-     *
-     * @param cartAddDTO 购物车添加信息
-     * @param request HTTP请求
+     * @param cartAddDTO 购物车添加信息，包含商品ID和数量
+     * @param request HTTP请求，用于获取当前登录用户信息
      * @return 操作结果
      */
     @PostMapping
@@ -62,9 +67,8 @@ public class ShopCartController {
 
     /**
      * 更新购物车中商品的数量
-     *
-     * @param cartAddDTO 购物车更新信息
-     * @param request HTTP请求
+     * @param cartAddDTO 购物车更新信息，包含商品ID和新数量
+     * @param request HTTP请求，用于获取当前登录用户信息
      * @return 操作结果
      */
     @PutMapping
@@ -80,9 +84,8 @@ public class ShopCartController {
 
     /**
      * 从购物车中删除商品
-     *
      * @param productId 商品ID
-     * @param request HTTP请求
+     * @param request HTTP请求，用于获取当前登录用户信息
      * @return 操作结果
      */
     @DeleteMapping("/{productId}")

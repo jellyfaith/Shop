@@ -15,7 +15,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * 后台商品管理接口
+ * 后台商品管理控制器
+ * 负责处理商品的增删改查、状态管理以及SKU相关操作
  */
 @RestController
 @RequestMapping("/backend/product")
@@ -23,17 +24,16 @@ import java.util.List;
 public class AdminProductController {
 
     @Autowired
-    private ProductService productService;
+    private ProductService productService;  // 商品服务，处理商品相关业务逻辑
 
     @Autowired
-    private ProductSkuService productSkuService;
+    private ProductSkuService productSkuService;  // 商品SKU服务，处理SKU相关业务逻辑
 
     /**
-     * 获取商品列表
-     *
-     * @param page 页码
-     * @param size 每页大小
-     * @param name 商品名称（可选）
+     * 获取商品分页列表
+     * @param page 页码，默认值为1
+     * @param size 每页大小，默认值为10
+     * @param name 商品名称（可选，支持模糊搜索）
      * @param categoryId 分类ID（可选）
      * @param sortField 排序字段（可选，如 price, stock, sales）
      * @param sortOrder 排序方式（可选，asc, desc）
@@ -50,24 +50,30 @@ public class AdminProductController {
         Page<Product> pageParam = new Page<>(page, size);
         LambdaQueryWrapper<Product> wrapper = new LambdaQueryWrapper<>();
         
+        // 按商品名称模糊搜索
         if (name != null && !name.isEmpty()) {
             wrapper.like(Product::getName, name);
         }
+        
+        // 按分类ID筛选
         if (categoryId != null) {
             wrapper.eq(Product::getCategoryId, categoryId);
         }
         
-        // 默认按创建时间倒序
+        // 排序处理
         if (sortField == null) {
+            // 默认按创建时间倒序
             wrapper.orderByDesc(Product::getCreateTime);
         } else {
             boolean isAsc = "asc".equalsIgnoreCase(sortOrder);
             if ("price".equals(sortField)) {
+                // 按最低价格排序
                 wrapper.orderBy(true, isAsc, Product::getMinPrice);
             } else if ("createTime".equals(sortField)) {
+                // 按创建时间排序
                 wrapper.orderBy(true, isAsc, Product::getCreateTime);
             }
-            // Add more sort fields if needed
+            // 可根据需要添加更多排序字段
         }
         
         return Result.success(productService.page(pageParam, wrapper));
@@ -75,7 +81,6 @@ public class AdminProductController {
 
     /**
      * 添加商品
-     *
      * @param product 商品信息
      * @return 操作结果
      */
@@ -88,7 +93,6 @@ public class AdminProductController {
 
     /**
      * 更新商品信息
-     *
      * @param product 商品信息
      * @return 操作结果
      */
@@ -101,7 +105,6 @@ public class AdminProductController {
 
     /**
      * 删除商品
-     *
      * @param id 商品ID
      * @return 操作结果
      */
@@ -112,6 +115,12 @@ public class AdminProductController {
         return Result.success("删除成功");
     }
 
+    /**
+     * 修改商品状态
+     * @param id 商品ID
+     * @param status 商品状态（0：下架，1：上架）
+     * @return 操作结果
+     */
     @PutMapping("/status/{id}/{status}")
     @Operation(summary = "修改商品状态")
     public Result<String> updateStatus(@PathVariable Long id, @PathVariable Integer status) {
@@ -122,6 +131,11 @@ public class AdminProductController {
         return Result.success("状态更新成功");
     }
 
+    /**
+     * 获取商品SKU列表
+     * @param productId 商品ID
+     * @return SKU列表
+     */
     @GetMapping("/skus/{productId}")
     @Operation(summary = "获取商品SKU列表")
     public Result<List<ProductSku>> getSkus(@PathVariable Long productId) {
@@ -130,6 +144,11 @@ public class AdminProductController {
         return Result.success(productSkuService.list(wrapper));
     }
 
+    /**
+     * 更新SKU库存/价格
+     * @param sku SKU信息
+     * @return 操作结果
+     */
     @PutMapping("/sku/update")
     @Operation(summary = "更新SKU库存/价格")
     public Result<String> updateSku(@RequestBody ProductSku sku) {
