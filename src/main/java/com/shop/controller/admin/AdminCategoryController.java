@@ -15,7 +15,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/backend/category")
 @Tag(name = "后台-分类管理")
-public class AdminCategoryController {
+public class
+AdminCategoryController {
 
     @Autowired
     private ProductCategoryService categoryService;
