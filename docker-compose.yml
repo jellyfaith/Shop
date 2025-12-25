@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: shop-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD} # 读取 .env 文件
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    # ports:
+    #   - "3306:3306"  <-- 务必注释掉！禁止公网直接访问数据库
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./src/main/resources/sql:/docker-entrypoint-initdb.d
+    networks:
+      - shop-network
+
+  redis:
+    image: redis:alpine
+    container_name: shop-redis
+    restart: always
+    # ports:
+    #   - "6379:6379"  <-- 务必注释掉！
+    networks:
+      - shop-network
+
+  backend:
+    build: .
+    container_name: shop-backend
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD} # 读取 .env 文件
+      SPRING_REDIS_HOST: ${REDIS_HOST}
+    depends_on:
+      - mysql
+      - redis
+    networks:
+      - shop-network
+
+  frontend:
+    build: ./frontend
+    container_name: shop-frontend
+    restart: always
+    ports:
+      - "80:80" # 只暴露 Web 服务端口
+    depends_on:
+      - backend
+    networks:
+      - shop-network
+
+volumes:
+  mysql_data:
+
+networks:
+  shop-network:
+    driver: bridge
