@@ -1,5 +1,6 @@
 <template>
   <div class="dashboard-container p-6">
+    <!-- 统计卡片行 -->
     <el-row :gutter="20">
       <el-col :span="6" v-for="(stat, index) in stats" :key="index">
         <el-card class="stat-card !border-none !rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 dark:bg-gray-800" shadow="hover">
@@ -17,6 +18,7 @@
       </el-col>
     </el-row>
 
+    <!-- 图表和时间线行 -->
     <el-row :gutter="20" class="mt-6">
       <el-col :span="16">
         <el-card shadow="hover" class="!border-none !rounded-xl dark:bg-gray-800">
@@ -25,6 +27,7 @@
               <span class="text-lg font-bold text-gray-900 dark:text-white">{{ $t('admin.salesOverview') }}</span>
             </div>
           </template>
+          <!-- ECharts 图表容器 -->
           <div ref="chartRef" class="h-[350px] bg-white dark:bg-gray-800 rounded-lg"></div>
         </el-card>
       </el-col>
@@ -35,6 +38,7 @@
               <span class="text-lg font-bold text-gray-900 dark:text-white">{{ $t('admin.recentActivity') }}</span>
             </div>
           </template>
+          <!-- 时间线组件 -->
           <el-timeline>
             <el-timeline-item v-for="(activity, index) in activities" :key="index" :timestamp="activity.time" placement="top" :type="activity.type">
               <span class="text-gray-700 dark:text-gray-300">{{ activity.content }}</span>

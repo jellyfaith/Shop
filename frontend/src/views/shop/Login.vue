@@ -1,7 +1,7 @@
 <template>
   <div class="login-container bg-white dark:bg-gray-900 transition-colors duration-300">
     <div class="login-box dark:bg-gray-800 relative">
-      <!-- Error Alert -->
+      <!-- 错误提示框 -->
       <transition name="el-fade-in-linear">
         <el-alert
           v-if="errorMessage"
@@ -15,7 +15,7 @@
         />
       </transition>
       
-      <!-- Success Alert -->
+      <!-- 成功提示框 -->
       <transition name="el-fade-in-linear">
         <el-alert
           v-if="successMessage"
@@ -37,7 +37,7 @@
         <el-form-item>
           <el-input v-model="form.password" type="password" :placeholder="$t('common.password')" prefix-icon="Lock" size="large" show-password />
         </el-form-item>
-        <!-- Confirm Password for Register -->
+        <!-- 注册时的确认密码输入框 -->
         <el-form-item v-if="isRegister">
           <el-input v-model="form.confirmPassword" type="password" :placeholder="$t('common.confirmPassword')" prefix-icon="Lock" size="large" show-password />
         </el-form-item>
@@ -69,7 +69,7 @@ const { t } = useI18n()
 const router = useRouter()
 const userStore = useUserStore()
 const loading = ref(false)
-const isRegister = ref(false)
+const isRegister = ref(false) // 是否为注册模式
 const errorMessage = ref('')
 const successMessage = ref('')
 const form = ref({
@@ -78,19 +78,20 @@ const form = ref({
   confirmPassword: ''
 })
 
-// Clear error message when switching modes
+// 切换模式时清除错误信息
 watch(isRegister, () => {
   errorMessage.value = ''
   successMessage.value = ''
 })
 
+// 切换登录/注册模式
 const toggleMode = () => {
   isRegister.value = !isRegister.value
   form.value = { username: '', password: '', confirmPassword: '' }
 }
 
 const handleSubmit = async () => {
-  errorMessage.value = '' // Clear previous errors
+  errorMessage.value = '' // 清除之前的错误
   successMessage.value = ''
   
   if (!form.value.username || !form.value.password) {

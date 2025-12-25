@@ -2,6 +2,7 @@
 @config "../tailwind.config.js";
 
 body {
+  /* 应用背景色和过渡效果，支持暗黑模式 */
   @apply bg-white dark:bg-gray-900 transition-colors duration-300;
 }
 

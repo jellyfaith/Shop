@@ -3,6 +3,7 @@
     <h1 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">{{ $t('shop.cart') }}</h1>
     
     <div v-if="cartItems && cartItems.length > 0">
+      <!-- 购物车商品列表 -->
       <div v-for="item in cartItems" :key="item.productId" class="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 py-4">
         <div class="flex items-center gap-4">
           <img :src="item.productIcon" alt="" class="w-20 h-20 object-cover rounded-lg bg-gray-100">
@@ -18,6 +19,7 @@
         </div>
       </div>
       
+      <!-- 底部结算栏 -->
       <div class="mt-8 flex justify-end items-center gap-6">
         <div class="text-xl text-gray-900 dark:text-white">
           {{ $t('shop.total') }} <span class="font-bold text-red-500 text-2xl">¥{{ totalPrice }}</span>
@@ -28,7 +30,7 @@
 
     <el-empty v-else :description="$t('shop.cartEmpty')" />
 
-    <!-- Checkout Dialog -->
+    <!-- 结算弹窗 -->
     <el-dialog v-model="checkoutVisible" :title="$t('shop.checkout')" width="600px">
       <el-form :model="checkoutForm" label-width="100px">
         <el-form-item :label="$t('shop.receiverInfo')">
@@ -52,6 +54,7 @@
           <div v-else class="text-gray-500 mb-2">{{ $t('settingsModal.noAddress') }}</div>
         </el-form-item>
 
+        <!-- 新增地址表单 -->
         <div v-if="selectedAddressId === -1 || addressList.length === 0" class="border-t pt-4 mt-2">
           <el-form-item :label="$t('shop.name')">
             <el-input v-model="checkoutForm.receiverName" />

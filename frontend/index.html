@@ -1,13 +1,35 @@
 <!doctype html>
+<!-- HTML5文档类型声明，告诉浏览器使用HTML5标准解析页面 -->
 <html lang="en">
+<!-- HTML根元素，指定页面语言为英语(en) -->
   <head>
+    <!-- 头部区域，包含页面元数据、样式和资源引用 -->
     <meta charset="UTF-8" />
+    <!-- 字符编码声明，指定页面使用UTF-8字符集，支持多种语言和特殊字符 -->
     <link rel="icon" type="image/svg+xml" href="./src/asserts/logo.svg" />
+    <!-- 页面图标设置：
+         - rel="icon"：指定链接资源的关系为图标
+         - type="image/svg+xml"：指定图标文件类型为SVG
+         - href="./src/asserts/logo.svg"：图标文件的相对路径 -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- 视口设置，用于响应式设计：
+         - width=device-width：将页面宽度设置为设备屏幕宽度
+         - initial-scale=1.0：初始缩放比例为1.0（不缩放）
+         这确保页面在不同设备上都能正确显示 -->
     <title>Shop</title>
+    <!-- 页面标题，显示在浏览器标签栏中 -->
   </head>
   <body>
+    <!-- 主体区域，包含页面的主要内容 -->
     <div id="app"></div>
+    <!-- Vue应用的挂载点：
+         - id="app"：唯一标识符，用于Vue实例挂载
+         Vue会将编译后的应用渲染到这个div元素中 -->
     <script type="module" src="./src/main.js"></script>
+    <!-- JavaScript模块引入：
+         - type="module"：声明这是一个ES6模块
+         - src="./src/main.js"：主JavaScript文件的相对路径
+         这个文件是Vue应用的入口文件，负责初始化Vue实例 -->
   </body>
 </html>
+<!-- HTML文档结束标签 -->

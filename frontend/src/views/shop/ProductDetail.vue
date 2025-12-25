@@ -7,7 +7,7 @@
       <div class='product-info'>
         <h1 class='text-gray-900 dark:text-white'>{{ product.name }}</h1>
         
-        <!-- Price Display -->
+        <!-- 价格显示：根据是否选中 SKU 显示不同价格 -->
         <p class='price'>
           <span v-if='currentSku'>{{ currentSku.price }}</span>
           <span v-else-if="priceRange">{{ priceRange }}</span>
@@ -19,7 +19,7 @@
           <p class='text-gray-600 dark:text-gray-400'>{{ product.description || $t('shop.noDescription') }}</p>
         </div>
 
-        <!-- Specs Selection -->
+        <!-- 规格选择区域 -->
         <div v-if='specKeys.length > 0' class='specs-section'>
           <div v-for='key in specKeys' :key='key' class='spec-group mb-4'>
             <h4 class='text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 capitalize'>{{ key }}</h4>
@@ -38,7 +38,7 @@
           </div>
         </div>
 
-        <!-- Stock Display -->
+        <!-- 库存显示 -->
         <div class='stock-info mb-4 text-gray-500 text-sm'>
           <span v-if='currentSku'>{{ $t('shop.stock') }} {{ currentSku.stock }}</span>
           <span v-else>{{ $t('shop.selectSpecs') }}</span>
@@ -69,7 +69,7 @@ const loading = ref(false)
 const quantity = ref(1)
 const selectedSpecs = ref({})
 
-// Computed: Get all unique spec keys from all SKUs
+// 计算属性：获取所有 SKU 中的唯一规格键
 const specKeys = computed(() => {
   if (!product.value || !product.value.skus) return []
   const keys = new Set()
@@ -81,7 +81,7 @@ const specKeys = computed(() => {
   return Array.from(keys)
 })
 
-// Computed: Get all unique values for each spec key
+// 计算属性：获取每个规格键的所有可选值
 const specOptions = computed(() => {
   if (!product.value || !product.value.skus) return {}
   const options = {}
@@ -97,7 +97,7 @@ const specOptions = computed(() => {
   return options
 })
 
-// Computed: Find the SKU that matches all selected specs
+// 计算属性：查找匹配当前选中规格的 SKU
 const currentSku = computed(() => {
   if (!product.value || !product.value.skus) return null
   // Check if all keys are selected

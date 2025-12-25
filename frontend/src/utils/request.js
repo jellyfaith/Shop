@@ -1,16 +1,19 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 
+// 创建 axios 实例
 const service = axios.create({
-  baseURL: '/api', // Use the proxy
-  timeout: 5000
+  baseURL: '/api', // 使用代理，指向后端接口
+  timeout: 5000 // 请求超时时间
 })
 
-// Request interceptor
+// 请求拦截器
 service.interceptors.request.use(
   config => {
+    // 从本地存储获取 token
     const token = localStorage.getItem('token')
     if (token) {
+      // 如果有 token，添加到请求头中
       config.headers['Authorization'] = 'Bearer ' + token
     }
     return config
@@ -21,21 +24,23 @@ service.interceptors.request.use(
   }
 )
 
-// Response interceptor
+// 响应拦截器
 service.interceptors.response.use(
   response => {
     const res = response.data
-    // You can add custom error handling here based on your backend code
-    // For example if code !== 200
+    // 这里可以根据后端返回的状态码进行统一处理
+    // 例如：if (res.code !== 200) { ... }
     return response
   },
   error => {
     console.log('err' + error)
+    // 处理 401 未授权错误
     if (error.response && error.response.status === 401) {
-        ElMessage.error('Unauthorized, please login again')
-        // Optional: redirect to login
+        ElMessage.error('未授权，请重新登录')
+        // 可选：重定向到登录页
     } else {
-        ElMessage.error(error.message)
+        // 显示错误信息
+        ElMessage.error(error.message || '请求失败')
     }
     return Promise.reject(error)
   }
