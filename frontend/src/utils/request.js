@@ -10,11 +10,18 @@ const service = axios.create({
 // 请求拦截器
 service.interceptors.request.use(
   config => {
-    // 从本地存储获取 token
-    const token = localStorage.getItem('token')
-    if (token) {
-      // 如果有 token，添加到请求头中
-      config.headers['Authorization'] = 'Bearer ' + token
+    // 判断是否是后台接口
+    if (config.url.includes('/backend/')) {
+      const adminToken = localStorage.getItem('adminToken')
+      if (adminToken) {
+        config.headers['Authorization'] = 'Bearer ' + adminToken
+      }
+    } else {
+      // 前台接口
+      const token = localStorage.getItem('token')
+      if (token) {
+        config.headers['Authorization'] = 'Bearer ' + token
+      }
     }
     return config
   },

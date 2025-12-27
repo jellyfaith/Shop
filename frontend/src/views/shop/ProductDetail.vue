@@ -59,6 +59,7 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import request from '../../utils/request'
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 
@@ -125,7 +126,7 @@ const priceRange = computed(() => {
 const fetchProduct = async () => {
   loading.value = true
   try {
-    const res = await axios.get(`/api/shop/product/${route.params.id}`)
+    const res = await request.get(`/shop/product/${route.params.id}`)
     if (res.data.code === 200) {
       const { product: productInfo, skus } = res.data.data
       product.value = { ...productInfo, skus }

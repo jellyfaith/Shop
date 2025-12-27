@@ -31,6 +31,12 @@ public class ShopProductController {
     @Autowired
     private ProductSkuMapper productSkuMapper;  // 商品SKU数据访问层，用于查询商品SKU信息
 
+    @Autowired
+    private com.shop.service.UserService userService;
+
+    @Autowired
+    private com.shop.service.UserLogService userLogService;
+
     /**
      * 搜索商品列表
      * 支持分页、关键字搜索、分类筛选、价格区间筛选
@@ -90,7 +96,7 @@ public class ShopProductController {
      */
     @GetMapping("/{id}")
     @Operation(summary = "商品详情")
-    public Result<ProductDetailVO> detail(@PathVariable Long id) {
+    public Result<ProductDetailVO> detail(@PathVariable Long id, jakarta.servlet.http.HttpServletRequest request) {
         // 根据商品ID查询商品信息
         Product product = productService.getById(id);
         if (product == null) {
@@ -107,6 +113,19 @@ public class ShopProductController {
         ProductDetailVO vo = new ProductDetailVO();
         vo.setProduct(product);
         vo.setSkus(skus);
+
+        // 记录浏览日志
+        try {
+            String username = (String) request.getAttribute("username");
+            if (username != null) {
+                com.shop.entity.User user = userService.lambdaQuery().eq(com.shop.entity.User::getUsername, username).one();
+                if (user != null) {
+                    userLogService.logView(user.getId(), id);
+                }
+            }
+        } catch (Exception e) {
+            // 忽略日志记录错误
+        }
         
         return Result.success(vo);
     }

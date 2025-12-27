@@ -160,3 +160,15 @@ CREATE TABLE IF NOT EXISTS `sales_report` (
 
 -- 初始化管理员
 -- INSERT INTO `admin_user` (`username`, `password`) VALUES ('admin', '123456');
+
+-- 10. 用户日志表
+CREATE TABLE IF NOT EXISTS `user_log` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `user_id` BIGINT NOT NULL COMMENT '用户ID',
+    `action_type` VARCHAR(20) NOT NULL COMMENT '操作类型: VIEW, BUY',
+    `target_id` BIGINT NOT NULL COMMENT '目标ID (商品ID或订单ID)',
+    `details` TEXT COMMENT '详情',
+    `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户日志表';

@@ -23,6 +23,12 @@ public class AdminUserController {
     @Autowired
     private AdminUserService adminUserService;  // 管理员用户服务，用于处理管理员登录等操作
 
+    @Autowired
+    private com.shop.service.UserService userService;
+
+    @Autowired
+    private com.shop.service.UserLogService userLogService;
+
     /**
      * 管理员登录
      * @param loginDTO 登录信息（包含用户名和密码）
@@ -43,8 +49,26 @@ public class AdminUserController {
     @GetMapping("/list")
     @Operation(summary = "用户列表")
     public Result<Page<User>> list(@RequestParam(defaultValue = "1") Integer page,
-                                   @RequestParam(defaultValue = "10") Integer size) {
-        // 此处为示例代码，实际项目中应该调用userService获取真实的用户列表
-        return Result.success(new Page<>(page, size));
+                                   @RequestParam(defaultValue = "10") Integer size,
+                                   @RequestParam(required = false) String username) {
+        Page<User> pageParam = new Page<>(page, size);
+        com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<User> wrapper = new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<>();
+        if (username != null && !username.isEmpty()) {
+            wrapper.like(User::getUsername, username);
+        }
+        wrapper.orderByDesc(User::getCreateTime);
+        return Result.success(userService.page(pageParam, wrapper));
+    }
+
+    @GetMapping("/{userId}/logs")
+    @Operation(summary = "用户日志")
+    public Result<Page<com.shop.entity.UserLog>> getLogs(@PathVariable Long userId,
+                                                         @RequestParam(defaultValue = "1") Integer page,
+                                                         @RequestParam(defaultValue = "10") Integer size) {
+        Page<com.shop.entity.UserLog> pageParam = new Page<>(page, size);
+        com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<com.shop.entity.UserLog> wrapper = new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<>();
+        wrapper.eq(com.shop.entity.UserLog::getUserId, userId);
+        wrapper.orderByDesc(com.shop.entity.UserLog::getCreateTime);
+        return Result.success(userLogService.page(pageParam, wrapper));
     }
 }

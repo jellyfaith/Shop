@@ -116,6 +116,9 @@
 
     <!-- Stock Dialog -->
     <el-dialog v-model="stockDialogVisible" :title="$t('admin.manageStock')" width="60%">
+      <div class="mb-4">
+        <el-button type="primary" @click="openAddSkuDialog">{{ $t('common.add') }} SKU</el-button>
+      </div>
       <el-table :data="skuList" style="width: 100%">
         <el-table-column prop="id" :label="$t('admin.id')" width="60" />
         <el-table-column prop="specs" :label="$t('admin.specs')">
@@ -136,9 +139,36 @@
         <el-table-column :label="$t('admin.operations')">
             <template #default="scope">
                 <el-button type="primary" size="small" @click="saveSku(scope.row)">{{ $t('common.save') }}</el-button>
+                <el-button type="danger" size="small" @click="deleteSku(scope.row)">{{ $t('admin.delete') }}</el-button>
             </template>
         </el-table-column>
       </el-table>
+    </el-dialog>
+
+    <!-- Add SKU Dialog -->
+    <el-dialog v-model="addSkuDialogVisible" :title="$t('common.add') + ' SKU'" width="40%">
+      <el-form :model="newSkuForm" label-width="80px">
+        <el-form-item :label="$t('admin.price')">
+          <el-input-number v-model="newSkuForm.price" :min="0" :precision="2" />
+        </el-form-item>
+        <el-form-item :label="$t('admin.stock')">
+          <el-input-number v-model="newSkuForm.stock" :min="0" />
+        </el-form-item>
+        <el-form-item :label="$t('admin.specs')">
+          <div v-for="(item, index) in newSkuSpecs" :key="index" class="flex gap-2 mb-2">
+            <el-input v-model="item.key" placeholder="Key (e.g. Color)" />
+            <el-input v-model="item.value" placeholder="Value (e.g. Red)" />
+            <el-button type="danger" size="small" @click="removeSpecRow(index)">Del</el-button>
+          </div>
+          <el-button type="default" class="w-full" @click="addSpecRow">+ Add Spec</el-button>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="addSkuDialogVisible = false">{{ $t('common.cancel') }}</el-button>
+          <el-button type="primary" @click="submitNewSku">{{ $t('common.save') }}</el-button>
+        </span>
+      </template>
     </el-dialog>
   </div>
 </template>
@@ -306,6 +336,79 @@ const saveSku = async (sku) => {
     } catch (e) {
         console.error(e)
     }
+}
+
+// New SKU Logic
+const addSkuDialogVisible = ref(false)
+const newSkuSpecs = ref([{ key: '', value: '' }])
+const newSkuForm = ref({
+  price: 0,
+  stock: 0,
+  image: ''
+})
+
+const openAddSkuDialog = () => {
+  newSkuSpecs.value = [{ key: '', value: '' }]
+  newSkuForm.value = { price: 0, stock: 0, image: '' }
+  addSkuDialogVisible.value = true
+}
+
+const addSpecRow = () => {
+  newSkuSpecs.value.push({ key: '', value: '' })
+}
+
+const removeSpecRow = (index) => {
+  newSkuSpecs.value.splice(index, 1)
+}
+
+const submitNewSku = async () => {
+  const specsMap = {}
+  newSkuSpecs.value.forEach(item => {
+    if (item.key && item.value) {
+      specsMap[item.key] = item.value
+    }
+  })
+
+  const payload = {
+    productId: currentProductId.value,
+    price: newSkuForm.value.price,
+    stock: newSkuForm.value.stock,
+    image: newSkuForm.value.image,
+    specs: specsMap
+  }
+
+  try {
+    await request.post('/backend/product/sku/add', payload)
+    ElMessage.success(t('common.addSuccess')) // Ensure translation exists or use hardcoded for now if key missing
+    addSkuDialogVisible.value = false
+    // Refresh SKU list
+    const res = await request.get(`/backend/product/skus/${currentProductId.value}`)
+    if (res.data.code === 200) {
+      skuList.value = res.data.data
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+const deleteSku = (sku) => {
+    ElMessageBox.confirm(t('common.delete') + '?', t('common.warning'), {
+    confirmButtonText: t('common.submit'),
+    cancelButtonText: t('common.cancel'),
+    type: 'warning',
+  }).then(async () => {
+    try {
+      await request.delete(`/backend/product/sku/${sku.id}`)
+      ElMessage.success(t('admin.deleted'))
+      // Refresh SKU list
+      const res = await request.get(`/backend/product/skus/${currentProductId.value}`)
+      if (res.data.code === 200) {
+        skuList.value = res.data.data
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  })
 }
 
 onMounted(() => {

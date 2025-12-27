@@ -45,9 +45,11 @@ import { User, Lock } from '@element-plus/icons-vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { useUserStore } from '../../stores/user'
 
 const { t } = useI18n()
 const router = useRouter()
+const userStore = useUserStore()
 const loading = ref(false)
 const form = ref({
   username: '',
@@ -63,7 +65,7 @@ const login = async () => {
   try {
     const res = await axios.post('/api/backend/user/login', form.value)
     if (res.data.code === 200) {
-      localStorage.setItem('token', res.data.data)
+      userStore.setAdminToken(res.data.data)
       ElMessage.success(t('common.loginSuccess'))
       router.push('/backend/dashboard')
     } else {

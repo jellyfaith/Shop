@@ -39,6 +39,21 @@ export default {
     confirm: 'Confirm',
     unknown: 'Unknown'
   },
+  user: {
+    manage: 'Customer Management',
+    searchPlaceholder: 'Search Username',
+    id: 'ID',
+    username: 'Username',
+    email: 'Email',
+    phone: 'Phone',
+    registerTime: 'Register Time',
+    viewLogs: 'View Logs',
+    logs: 'User Logs',
+    logType: 'Type',
+    targetId: 'Target ID',
+    details: 'Details',
+    time: 'Time'
+  },
   order: {
     orderNo: 'Order No',
     totalAmount: 'Total Amount',

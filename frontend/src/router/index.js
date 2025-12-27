@@ -95,6 +95,12 @@ const routes = [
         meta: { requiresAuth: true, role: 'ADMIN' }
       },
       {
+        // 客户管理：/backend/user
+        path: 'user',
+        component: () => import('../views/backend/UserManage.vue'),
+        meta: { requiresAuth: true, role: 'ADMIN' }
+      },
+      {
         path: 'category',
         component: () => import('../views/backend/CategoryManage.vue'),
         meta: { requiresAuth: true, role: 'ADMIN' }

@@ -41,6 +41,21 @@ export default {
     confirm: '确认',
     unknown: '未知'
   },
+  user: {
+    manage: '客户管理',
+    searchPlaceholder: '搜索用户名',
+    id: 'ID',
+    username: '用户名',
+    email: '邮箱',
+    phone: '手机号',
+    registerTime: '注册时间',
+    viewLogs: '查看日志',
+    logs: '用户日志',
+    logType: '类型',
+    targetId: '目标ID',
+    details: '详情',
+    time: '时间'
+  },
   order: {
     orderNo: '订单编号',
     totalAmount: '总金额',

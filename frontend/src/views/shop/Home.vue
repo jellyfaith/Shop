@@ -38,7 +38,7 @@
               type="text" 
               :placeholder="$t('shop.searchPlaceholder')" 
               class="w-full pl-11 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border-none rounded-xl text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-violet-500 focus:bg-white dark:focus:bg-black transition-all duration-200"
-              @keyup.enter="fetchProducts"
+              @keyup.enter="handleSearch"
             />
           </div>
         </div>
@@ -48,12 +48,12 @@
           <el-select 
             v-model="selectedCategory" 
             :placeholder="$t('shop.category')" 
-            @change="fetchProducts" 
+            @change="handleSearch" 
             size="large" 
             class="w-full !rounded-xl"
             effect="dark"
+            clearable
           >
-            <el-option :label="$t('shop.all')" value="" />
             <el-option 
               v-for="cat in categories" 
               :key="cat.id" 
@@ -65,7 +65,7 @@
 
         <!-- 搜索按钮：直接使用动态主题色 -->
         <button 
-          @click="fetchProducts"
+          @click="handleSearch"
           class="w-full md:w-auto px-8 py-3 text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-lg active:scale-95 transform duration-150 !w-28"
           :style="{ backgroundColor: themeColor }"
         >
@@ -208,7 +208,7 @@ const fetchProducts = async (append = false) => {
     const res = await axios.get('/api/shop/product/list', {
       params: {
         keyword: searchKeyword.value,
-        categoryId: selectedCategory.value,
+        categoryId: selectedCategory.value || null, // Ensure empty string becomes null
         page: currentPage.value,
         size: pageSize.value
       }
@@ -225,6 +225,11 @@ const fetchProducts = async (append = false) => {
   } finally {
     loading.value = false
   }
+}
+
+const handleSearch = () => {
+  products.value = [] // Clear current list
+  fetchProducts(false)
 }
 
 const loadMore = () => {

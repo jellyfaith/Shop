@@ -24,6 +24,12 @@ public class ShopOrderController {
     @Autowired
     private OrderService orderService;  // 订单服务，处理订单相关业务逻辑
 
+    @Autowired
+    private com.shop.service.UserService userService;
+
+    @Autowired
+    private com.shop.service.UserLogService userLogService;
+
     /**
      * 从请求中获取当前登录用户的用户名
      * 用户名由JWT拦截器解析并设置到请求属性中
@@ -46,6 +52,18 @@ public class ShopOrderController {
         String username = getUsername(request);
         if (username == null) return Result.error("未登录");  // 未登录验证
         String orderNo = orderService.create(username, orderCreateDTO);  // 调用服务层创建订单
+
+        // 记录购买日志
+        try {
+             com.shop.entity.User user = userService.lambdaQuery().eq(com.shop.entity.User::getUsername, username).one();
+             com.shop.entity.OrderMaster order = orderService.lambdaQuery().eq(com.shop.entity.OrderMaster::getOrderNo, orderNo).one();
+             if (user != null && order != null) {
+                 userLogService.logBuy(user.getId(), order.getId(), "Order No: " + orderNo);
+             }
+        } catch (Exception e) {
+            // 忽略
+        }
+
         return Result.success(orderNo);
     }
 

@@ -155,4 +155,28 @@ public class AdminProductController {
         productSkuService.updateById(sku);
         return Result.success("更新成功");
     }
+
+    /**
+     * 添加商品SKU
+     * @param sku SKU信息
+     * @return 操作结果
+     */
+    @PostMapping("/sku/add")
+    @Operation(summary = "添加商品SKU")
+    public Result<String> addSku(@RequestBody ProductSku sku) {
+        productSkuService.save(sku);
+        return Result.success("添加成功");
+    }
+
+    /**
+     * 删除商品SKU
+     * @param id SKU ID
+     * @return 操作结果
+     */
+    @DeleteMapping("/sku/{id}")
+    @Operation(summary = "删除商品SKU")
+    public Result<String> deleteSku(@PathVariable Long id) {
+        productSkuService.removeById(id);
+        return Result.success("删除成功");
+    }
 }

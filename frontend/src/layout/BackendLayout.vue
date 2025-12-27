@@ -28,6 +28,11 @@
             <el-icon><List /></el-icon>
             <span>{{ $t('admin.orderManage') }}</span>
           </el-menu-item>
+          <!-- 客户管理菜单项 -->
+          <el-menu-item index="/backend/user">
+            <el-icon><User /></el-icon>
+            <span>{{ $t('user.manage') }}</span>
+          </el-menu-item>
         </el-menu>
       </el-aside>
       <el-container>
@@ -63,7 +68,7 @@
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item @click="$router.push('/backend/login')">{{ $t('common.logout') }}</el-dropdown-item>
+                <el-dropdown-item @click="handleLogout">{{ $t('common.logout') }}</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -78,13 +83,22 @@
 </template>
 
 <script setup>
-import { Odometer, Goods, ArrowDown, List, Sunny, Moon } from '@element-plus/icons-vue'
+import { Odometer, Goods, ArrowDown, List, Sunny, Moon, User } from '@element-plus/icons-vue'
 import { useI18n } from 'vue-i18n'
 import { computed, onMounted, watch } from 'vue'
 import { useThemeStore } from '../stores/theme'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '../stores/user'
 
 const themeStore = useThemeStore()
 const { locale, t } = useI18n()
+const router = useRouter()
+const userStore = useUserStore()
+
+const handleLogout = () => {
+  userStore.adminLogout()
+  router.push('/backend/login')
+}
 
 // 初始化后台主题
 onMounted(() => {

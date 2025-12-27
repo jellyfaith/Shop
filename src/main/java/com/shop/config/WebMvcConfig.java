@@ -17,6 +17,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Autowired // 自动注入JWT拦截器
     private JwtInterceptor jwtInterceptor;
 
+    @Autowired
+    private com.shop.security.OptionalJwtInterceptor optionalJwtInterceptor;
+
     /**
      * 配置CORS跨域资源共享
      * 允许前端应用从不同域名访问后端API
@@ -55,5 +58,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/webjars/**", // Webjars资源
                         "/doc.html" // API文档页面
                 );
+
+        // 注册可选JWT拦截器，仅针对商品详情等需要记录日志但公开的接口
+        registry.addInterceptor(optionalJwtInterceptor)
+                .addPathPatterns("/shop/product/**");
     }
 }
